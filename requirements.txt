@@ -1,0 +1,11 @@
+langchain==0.0.216
+gradio==3.39.0
+openai==0.27.8
+pinecone_client==2.2.2
+unstructured==0.7.10
+tiktoken==0.4.0
+fastapi==0.100.0
+pydantic==1.10.9
+uvicorn==0.23.1
+twilio==8.5.0
+python-multipart==0.0.6
