@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Audio Recording and Playback</title>
+</head>
+<body>
+    <h1>Audio Recording and Playback</h1>
+    
+    <h2>Press Space to Start Recording</h2>
+    <audio controls id="recordedAudio"></audio>
+    
+    <script>
+        let mediaRecorder;
+        let recordedChunks = [];
+        let isRecording = false;
+        
+        const recordedAudio = document.getElementById('recordedAudio');
+
+        const handleSuccess = (stream) => {
+            mediaRecorder = new MediaRecorder(stream);
+
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    recordedChunks.push(event.data);
+                }
+            };
+
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(recordedChunks, { type: 'audio/mpeg' });
+                recordedChunks = [];
+                const audioUrl = URL.createObjectURL(blob);
+                recordedAudio.src = audioUrl;
+                
+                // Send the recorded audio to the server
+                const formData = new FormData();
+                formData.append('audio', blob);
+                
+                fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Upload success:', data);
+                })
+                .catch(error => {
+                    console.error('Upload error:', error);
+                });
+            };
+        };
+
+        document.addEventListener('keydown', (event) => {
+            if (event.code === 'Space' && !isRecording) {
+                navigator.mediaDevices.getUserMedia({ audio: true })
+                    .then(handleSuccess)
+                    .then(() => {
+                        mediaRecorder.start();
+                        isRecording = true;
+                    })
+                    .catch(err => console.error('Error accessing microphone:', err));
+            }
+        });
+
+        document.addEventListener('keyup', (event) => {
+            if (event.code === 'Space' && isRecording) {
+                mediaRecorder.stop();
+                isRecording = false;
+            }
+        });
+    </script>
+</body>
+</html>
