@@ -12,7 +12,7 @@
 import os
 import pinecone
 from tools.dbbase import SQLDatabase
-from tools.cal_eve import event
+# from tools.cal_eve import event
 from tools.constants import prompt
 from tools.vectorstore import vectordb
 from tools.dbchain import SQLDatabaseChain 
@@ -23,6 +23,7 @@ from langchain.agents import AgentType, Tool, AgentExecutor , initialize_agent ,
 from sqlalchemy import create_engine
 # import summarization memory
 from langchain.memory import ConversationSummaryBufferMemory
+from sayvai_tools.tools.calendar import Calendar as GCalender
 
 
 with open("openai_api_key.txt", "r") as f:
@@ -88,8 +89,8 @@ class Assistant:
                 ),
                 Tool(
                     name="calendar",
-                    func=event,
-                    description="useful when you need to schedule an event. Input should be start and end time(Example input:2023,10,20,13,30/ 2023,10,20,14,00 as string not as json."
+                    func=GCalender()._run,
+                    description="useful when you need to schedule an event. Input should be start and end time(Example input:2023,10,20,13,30/ 2023,10,20,14,00/mail"
                 ),
             ]
         else :
